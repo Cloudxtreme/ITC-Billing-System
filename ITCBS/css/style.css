@@ -1,0 +1,213 @@
+html
+{
+	font-family:century gothic;
+}
+input
+{
+	font-family:century gothic;
+}
+a,a:hover,a:visited{
+	text-decoration:none;
+	color:white;
+}
+table.soaTable
+{
+	text-align:center;
+	width: 100%;
+	
+	
+}
+table.rto
+{
+	text-align:center;
+	width: 100%;
+	border-color:lightgray;
+	
+}
+table{
+	border: lightgray;
+}
+table.jr
+{
+	padding-top:3%;
+	text-align:center;
+	width: 100%;
+	float:right;
+}
+table.jrDetalye
+{
+	padding-left:15%;
+	text-align:left;
+	width: 100%;
+	float:right;
+}
+table.editJR{
+	text-align:center;
+}
+h2{
+	color:red;
+}
+
+legend.print{
+	text-decoration: bold-face;
+	border-color:black;
+	background-color:white;
+	color: black;
+}
+legend{
+	border:solid 1px;
+	text-decoration: bold-face;
+	border-color:lightgray;
+	background-color:#7b1113;
+	color: white;
+	padding-top:0.3em;
+	padding-bottom:0.3em;
+	padding-left:1em;
+	padding-right:1em;
+}
+
+fieldset{
+	border-radius:10px;
+}
+#justSpace{
+	
+}
+#printVersion{
+	font-family:times new roman;
+
+}
+#printVersion fieldset{
+	border-radius:0px;
+}
+
+
+#income_stats{
+	width:55%;
+	float:left;
+}
+#incomePerSect{
+	width:40%;
+	float:right;
+}
+.soaTable th.titleTable{
+	background-color:#7b1113;
+	color: white;
+	font-size: 20px;
+	padding: 3px;
+	
+
+}
+.rto th.titleTable{
+	background-color:#7b1113;
+	color: white;
+	font-size: 18px;
+	padding: 3px;
+	
+
+}
+.rto td{
+	font-size: 15px;
+}
+.jr th.titleTable{
+	background-color:#7b1113;
+	color: white;
+	font-size: 20px;
+	padding: 3px;
+	
+
+}
+td.highlight{
+	background-color:#7b1113;
+	color: white;
+	//font-size: 20px;
+	padding: 3px;
+	width:130px;
+	text-align:center;
+}
+td.highlight2{
+	background-color:#7b1113;
+	color: white;
+	font-size: 14px;
+	padding: 3px;
+	width:140px;
+	text-align:center;
+}
+#functions{
+	width: 20%;
+	float:left;
+}
+#table_JR{
+	width:77.5%;
+	float:right;
+	
+}
+#addNew{
+	padding-top :10%;
+	width:19%;
+}
+#scrollable{
+	overflow:auto;
+	height:450px;
+	width:100%;
+}
+#soaScrollable{
+	overflow:auto;
+	height:300px;
+	width:100%;
+}
+#searchNum{
+	float:left;
+	padding-top :15%;
+	
+}
+#searchDate{
+
+	float:left;
+}
+#searchBar{
+	padding-top:7%;
+}
+#soaLeft{
+	float:left;
+	width: 65%;
+	padding-right:5%;
+	//padding-bottom:5%;
+	padding-top:1%;
+	
+}
+#soaRight{
+	float:left;
+	width:30%;
+	padding-bottom:3%;
+}
+
+#dashboardLeft{
+	width:40%;
+	float:left;
+}
+#dashboardRight{
+	width:30%;
+	float:left;
+	padding-left: 2%;
+}
+#pieChart{
+	padding-top:5%;
+	padding-left: 20%;
+	width:40%;
+	float:left;
+}
+
+#fundLeft{
+	float:left;
+	width: 40%;
+}
+#fundRight{
+	float:right;
+	//padding-left:3%;
+	width: 58%;
+}
+
+#rtoProjection{
+	height:100%;
+	width:100%;
+}
