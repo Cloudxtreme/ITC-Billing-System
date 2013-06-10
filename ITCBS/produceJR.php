@@ -160,15 +160,8 @@
 		//header('Location: produceJR.php');
 	}
 	
+	//viewing for printing after adding
 	if(isset($_POST['serviceSection'])){
-	
-		$lastNum = $user->retrieveMaxJRNum();
-		if($lastNum==NULL){
-			$lastNum=100;
-		}
-		else{
-			$lastNum=$lastNum+=1;
-		}
 	
 		if($_POST['serviceSection']=="System Ad"){
 			$srvce_sect="SYS";
@@ -251,7 +244,7 @@
 		$end_of_contract=$_POST['rent_end'];
 		
 	}
-	
+	//viewing after clicking view button
 	else {
 		$count=$user->countJR($sessionUserSection);
 		if($sessionUserType=="Executive")
@@ -632,10 +625,28 @@
 				<td>
 				</td>
 				<td>
-					<pre>    (End User's Signature)</pre>
+					<pre>  Signature Over Printed Name</pre>
 				</td>
 			</tr>
-		</table>
+			</table>
+			<?php if($sessionUserSection=="MIS" || $sessionUserSection=="System Ad" || $sessionUserSection=="Network Ad"){ ?>
+			<br/>
+			<br/>
+			<table>
+			<tr>
+				<td><b>Assigned Technician: </b></td>
+				<td>&nbsp;&nbsp;&nbsp;  ________________________________</td>
+			</tr>
+			<tr>
+				<td>
+				</td>
+				<td>
+					<pre>&nbsp;&nbsp;  Signature Over Printed Name</pre>
+				</td>
+			</tr>
+			</table>
+			<?php } ?>
+		
 		<?php } if($sessionUserSection=="Tech Support"){ ?>
 		<fieldset class="print">
 			<table>

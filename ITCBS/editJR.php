@@ -476,11 +476,11 @@
 						</tr>
 						<tr>
 							<td>Total number of hours: </td>
-							<td><input type="text" name="total_hours" size="60" value="<?php echo $gen['TOTAL_TIME'];?>"/></td>
+							<td><input type="number" name="total_hours" size="60" value="<?php echo $gen['TOTAL_TIME'];?>"/></td>
 						</tr>
 						<tr>
 							<td>Total amount: </td>
-							<td><input type="text" name="total_amount" size="60" value="<?php echo $gen['TOTAL_AMOUNT'];?>"/></td>
+							<td><input type="number" name="total_amount" size="60" value="<?php echo $gen['TOTAL_AMOUNT'];?>"/></td>
 						</tr>
 					</table>
 				</fieldset>
