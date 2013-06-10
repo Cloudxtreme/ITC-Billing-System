@@ -21,6 +21,7 @@
 	$editting=0;
 	$saving=0;
 	$search=0;
+	$choose=0;
 	
 	//checking for the submit buttons are triggered
 	while($row=mysqli_fetch_assoc($result)){
@@ -51,6 +52,10 @@
 		$search = 1;
 		$soaToView = $_POST["soaToView"];
 		
+	}
+	
+	if(isset($_POST["continue"])){
+		$choose=1;
 	}
 	
 	//saving the updates in a SOA
@@ -166,6 +171,18 @@
 				return true;
 			}
 		}
+		
+		function checkForChecks(){
+			var target=document.getElementsByTagName('input');
+			for(i=0; i<target.length; i++)
+			{
+				if(target[i].type=='checkbox'){
+					if(target[i].checked)
+						return true;
+				}
+			}
+			return false;
+		}
 		</script>
 	</head>
 	<body>
@@ -207,8 +224,6 @@
 					echo '<form method="post" onsubmit="return checkIfNull()" action="">';
 						echo '<table style="width:100%">';
 						echo '<col width="150">';
-						
-						
 						echo '<tr>';
 							echo '<td>';
 								echo 'Name:';
@@ -245,18 +260,14 @@
 							echo '<input type="text" style="width:200px" id="reqOther" name="cliente" placeholder="Office / Unit"/>';
 							echo '</div></td>';
 						echo '</tr>';
-						echo '<tr>';
-							echo '<td>';
-								echo 'Amount (in words):';
-							echo '</td>';
-							echo '<td>';
-								echo '<input type="text" style="width:300px" name="amountWords" required/>';
-							echo '</td>';
-						echo '</tr>';
 						echo '</table>';
 						
 						echo '<br/>';
-						echo '<input type="submit" name="generate" value="Generate" style="width:200px">';
+						if($sessionUserSection!="Rent to Own"){
+							echo '<input type="submit" name="continue" value="Continue" style="width:200px">';
+						}else{
+							echo '<input type="submit" name="generate" value="Generate" style="width:200px">';
+						}
 					echo '</form>';
 				}else{
 					//----------------Only for Rent to Own--------------//
@@ -308,12 +319,14 @@
 					//--------------------End for Rent to Own------------------//
 				}
 				echo '</fieldset>';
-				echo '<div id="searchBar" name="searchBar">';
-					echo '<form method="post" onsubmit="return checkIfNullSearch()" action="">';
-						echo '<input type="search" name="soaToView" id="soaToView" placeholder="Enter SOA number here.."/>';
-						echo '<input type="submit" value="Search" name="search" id="search"/><br/><br/>';
-					echo '</form>';
-				echo '</div>';
+				if($choose!=1){
+					echo '<div id="searchBar" name="searchBar">';
+						echo '<form method="post" onsubmit="return checkIfNullSearch()" action="">';
+							echo '<input type="search" name="soaToView" id="soaToView" placeholder="Enter SOA number here.."/>';
+							echo '<input type="submit" value="Search" name="search" id="search"/><br/><br/>';
+						echo '</form>';
+					echo '</div>';
+				}
 				echo '</div>';
 			}
 			
@@ -438,157 +451,253 @@
 			echo '<br/>';
 			
 			if($search!=1){
-				//---------------If not searching------------//
-				//displays the Unpaid SOAs 
-				if($sessionUserType!="Executive"){
-					$stmt = "SELECT soa_number, soa_main_number, client_office, client_name,total_amount, payment_status,section FROM soa
-						where section='$sessionUserSection' and payment_status like 'Unpaid';";
-				}else{
-					$stmt = "SELECT soa_number, soa_main_number, client_office, total_amount, payment_status, client_name,section FROM soa
-						where payment_status like 'Unpaid';";
-				}
-				$result = mysqli_query($con,$stmt);
-				echo '<div id="soaScrollable">';
-				echo '<table class="soaTable" cellspacing="0" border=1px;>';
-				echo '<tr>';
-					echo '<th class="titleTable" colspan=5>';
-						echo "Unpaid Statements Of Account";
-					echo '</th>';
-				echo '</tr>';
-				echo '<tr>';
-					echo '<th style="width:25%;">';
-						echo "SOA Number";
-					echo '</th>';
-					echo '<th  style="width:35%;">';
-						echo "Client";
-					echo '</th>';
-					echo '<th  style="width:20%;">';
-						echo "Amount";
-					echo '</th>';
+				if($choose!=1){
+					//---------------If not searching and choosing job requests------------//
+					//displays the Unpaid SOAs 
 					if($sessionUserType!="Executive"){
-						echo '<th style="width:20%;">';
-							echo "Update";
-						echo '</th>';
+						$stmt = "SELECT soa_number, soa_main_number, client_office, client_name,total_amount, payment_status,section FROM soa
+							where section='$sessionUserSection' and payment_status like 'Unpaid';";
 					}else{
-						echo '<th style="width:20%;">';
-							echo "View";
-						echo '</th>';
+						$stmt = "SELECT soa_number, soa_main_number, client_office, total_amount, payment_status, client_name,section FROM soa
+							where payment_status like 'Unpaid';";
 					}
-				echo '</tr>';
-				while($row=mysqli_fetch_assoc($result)){
+					$result = mysqli_query($con,$stmt);
+					echo '<div id="soaScrollable">';
+					echo '<table class="soaTable" cellspacing="0" border=1px;>';
 					echo '<tr>';
-						echo '<td  style="width:25%;">';
-							echo $row['soa_main_number'];
-							$soa = $row['soa_number'];
-						echo '</td>';
-						echo '<td  style="width:35%;">';
-							if($row['section']!="Rent to Own")
-								echo $row['client_office'];
-							else echo $row['client_name'];
-						echo '</td>';
-						echo '<td style="width:20%;">';
-							echo $row['total_amount'];
-						echo '</td>';
+						echo '<th class="titleTable" colspan=5>';
+							echo "Unpaid Statements Of Account";
+						echo '</th>';
+					echo '</tr>';
+					echo '<tr>';
+						echo '<th style="width:25%;">';
+							echo "SOA Number";
+						echo '</th>';
+						echo '<th  style="width:35%;">';
+							echo "Client";
+						echo '</th>';
+						echo '<th  style="width:20%;">';
+							echo "Amount";
+						echo '</th>';
 						if($sessionUserType!="Executive"){
-							echo '<td style="width:20%;">';
-								echo '<form method="post" action="">';
-									echo '<input type="submit" style="width:100px;" name="'.$soa.'" value="Update"/>';
-								echo '</form>';
-							echo '</td>';
+							echo '<th style="width:20%;">';
+								echo "Update";
+							echo '</th>';
 						}else{
-							echo '<td style="width:20%;">';
-								echo '<form method="post" action="">';
-									echo '<input type="submit" style="width:100px;" name="'.$soa.'" value="View"/>';
-								echo '</form>';
-							echo '</td>';
+							echo '<th style="width:20%;">';
+								echo "View";
+							echo '</th>';
 						}
 					echo '</tr>';
+					while($row=mysqli_fetch_assoc($result)){
+						echo '<tr>';
+							echo '<td  style="width:25%;">';
+								echo $row['soa_main_number'];
+								$soa = $row['soa_number'];
+							echo '</td>';
+							echo '<td  style="width:35%;">';
+								if($row['section']!="Rent to Own")
+									echo $row['client_office'];
+								else echo $row['client_name'];
+							echo '</td>';
+							echo '<td style="width:20%;">';
+								echo $row['total_amount'];
+							echo '</td>';
+							if($sessionUserType!="Executive"){
+								echo '<td style="width:20%;">';
+									echo '<form method="post" action="">';
+										echo '<input type="submit" style="width:100px;" name="'.$soa.'" value="Update"/>';
+									echo '</form>';
+								echo '</td>';
+							}else{
+								echo '<td style="width:20%;">';
+									echo '<form method="post" action="">';
+										echo '<input type="submit" style="width:100px;" name="'.$soa.'" value="View"/>';
+									echo '</form>';
+								echo '</td>';
+							}
+						echo '</tr>';
+					}
+					echo '</table>';
+					echo '</div>';
+					echo '<br/>';
+					
+					//displays the Paid SOAs 
+					if($sessionUserType!="Executive"){
+						$stmt = "SELECT soa_number, soa_main_number, or_number, client_office, client_name, total_amount, payment_status, section FROM soa 
+							where section='$sessionUserSection' and payment_status like 'Paid';";
+					}else{
+						$stmt = "SELECT soa_number, soa_main_number, or_number, client_office, total_amount, client_name,section,payment_status FROM soa 
+							where payment_status like 'Paid';";
+					}
+					$result = mysqli_query($con,$stmt);
+					
+					echo '<div id="soaScrollable" >';
+					echo '<table class="soaTable" cellspacing="0" border=1px;>';
+					echo '<tr>';
+						echo '<th class="titleTable" colspan=5>';
+							echo "Paid Statements Of Account";
+						echo '</th>';
+					echo '</tr>';
+					echo '<tr>';
+						echo '<th style="width:20%;">';
+							echo "SOA Number";
+						echo '</th>';
+						echo '<th style="width:25%;">';
+							echo "Client";
+						echo '</th>';
+						echo '<th style="width:20%;">';
+							echo "Amount";
+						echo '</th>';
+						echo '<th style="width:20%;">';
+							echo "OR Number";
+						echo '</th>';
+						if($sessionUserType!="Executive"){
+							echo '<th style="width:15%;">';
+								echo "Update";
+							echo '</th>';
+						}else{
+							echo '<th style="width:15%;">';
+								echo "View";
+							echo '</th>';
+						}
+					echo '</tr>';
+					while($row=mysqli_fetch_assoc($result)){
+						echo '<tr>';
+							echo '<td  style="width:20%;">';
+								echo $row['soa_main_number'];
+								$soa = $row['soa_number'];
+							echo '</td>';
+							echo '<td  style="width:25%;">';
+								if($row['section']!="Rent to Own")
+									echo $row['client_office'];
+								else echo $row['client_name'];
+							echo '</td>';
+							echo '<td style="width:20%;">';
+								echo $row['total_amount'];
+							echo '</td>';
+							echo '<td style="width:20%;">';
+								echo $row['or_number'];
+							echo '</td>';
+							if($sessionUserType!="Executive"){
+								echo '<td style="width:15%;">';
+									echo '<form method="post" action="">';
+										echo '<input type="submit" style="width:80px;" name="'.$soa.'" value="Update"/>';
+									echo '</form>';
+								echo '</td>';
+							}else{
+								echo '<td style="width:15%;">';
+									echo '<form method="post" action="">';
+										echo '<input type="submit" style="width:80px;" name="'.$soa.'" value="View"/>';
+									echo '</form>';
+								echo '</td>';
+							}
+						echo '</tr>';
+					}
+					echo '</table>';
+					echo '</div>';
+					//-----------------End of tables---------------//
 				}
-				echo '</table>';
-				echo '</div>';
 				echo '<br/>';
-				
-				//displays the Paid SOAs 
-				if($sessionUserType!="Executive"){
-					$stmt = "SELECT soa_number, soa_main_number, or_number, client_office, client_name, total_amount, payment_status, section FROM soa 
-						where section='$sessionUserSection' and payment_status like 'Paid';";
-				}else{
-					$stmt = "SELECT soa_number, soa_main_number, or_number, client_office, total_amount, client_name,section,payment_status FROM soa 
-						where payment_status like 'Paid';";
-				}
-				$result = mysqli_query($con,$stmt);
-				
-				echo '<div id="soaScrollable" >';
-				echo '<table class="soaTable" cellspacing="0" border=1px;>';
-				echo '<tr>';
-					echo '<th class="titleTable" colspan=5>';
-						echo "Paid Statements Of Account";
-					echo '</th>';
-				echo '</tr>';
-				echo '<tr>';
-					echo '<th style="width:20%;">';
-						echo "SOA Number";
-					echo '</th>';
-					echo '<th style="width:25%;">';
-						echo "Client";
-					echo '</th>';
-					echo '<th style="width:20%;">';
-						echo "Amount";
-					echo '</th>';
-					echo '<th style="width:20%;">';
-						echo "OR Number";
-					echo '</th>';
-					if($sessionUserType!="Executive"){
-						echo '<th style="width:15%;">';
-							echo "Update";
-						echo '</th>';
-					}else{
-						echo '<th style="width:15%;">';
-							echo "View";
-						echo '</th>';
-					}
-				echo '</tr>';
-				while($row=mysqli_fetch_assoc($result)){
-					echo '<tr>';
-						echo '<td  style="width:20%;">';
-							echo $row['soa_main_number'];
-							$soa = $row['soa_number'];
-						echo '</td>';
-						echo '<td  style="width:25%;">';
-							if($row['section']!="Rent to Own")
-								echo $row['client_office'];
-							else echo $row['client_name'];
-						echo '</td>';
-						echo '<td style="width:20%;">';
-							echo $row['total_amount'];
-						echo '</td>';
-						echo '<td style="width:20%;">';
-							echo $row['or_number'];
-						echo '</td>';
-						if($sessionUserType!="Executive"){
-							echo '<td style="width:15%;">';
-								echo '<form method="post" action="">';
-									echo '<input type="submit" style="width:80px;" name="'.$soa.'" value="Update"/>';
-								echo '</form>';
-							echo '</td>';
-						}else{
-							echo '<td style="width:15%;">';
-								echo '<form method="post" action="">';
-									echo '<input type="submit" style="width:80px;" name="'.$soa.'" value="View"/>';
-								echo '</form>';
-							echo '</td>';
-						}
-					echo '</tr>';
-				}
-				echo '</table>';
-				echo '</div>';
-				//-----------------End of tables---------------//
 			}
-			echo '<br/>';
 		}
 		
+		//choosing job requests
+		if(isset($_POST['continue'])){
+			if($_POST['cliente']!=""){
+				echo '<form method="post" onsubmit="return checkForChecks()" action="">';
+				
+				
+				$cliente = $_POST['cliente'];
+				$name = $_POST['clientName'];
+				$designation = $_POST['clientDesig'];
+				echo '<input type="hidden" name="cliente" value="'.$cliente.'"/>';
+				echo '<input type="hidden" name="clientName" value="'.$name.'"/>';
+				echo '<input type="hidden" name="clientDesig" value="'.$designation.'"/>';
+				if($sessionUserSection!="Rent to Own"){
+					//looks for job requests of the chosen client office
+					//that are already done, but not yet billed, and if it is not free,
+					//meaning, there is an amount indicated
+					$stmt = "SELECT jr_number,date_created, service_type, amount from job_request where 
+					client_office='$cliente' and 
+					bill_status='Unbilled' and 
+					amount!=0 and
+					section='$sessionUserSection';";
+					$result = mysqli_query($con,$stmt);
+					echo '<fieldset>';
+					echo '<legend>Job Requests</legend>';
+					echo '<br/>Client Office: <b>'.$cliente.'</b><br/><br/>';
+					echo '<table class="soaTable" cellspacing="0" border=1px >';
+					echo '<tr>';
+						echo '<th  style="width:5%;">';
+						echo '</th>';
+						echo '<th  style="width:20%;">';
+							echo "JR Number";
+						echo '</th>';
+						echo '<th  style="width:20%px;">';
+							echo "Date";
+						echo '</th>';
+						echo '<th  style="width:35%;">';
+							echo "Description";
+						echo '</th>';
+						echo '<th style="width:20%">';
+							echo "Amount";
+						echo '</th>';
+					echo '</tr>';
+					while($row = mysqli_fetch_array($result)){
+						echo '<tr>';
+							echo '<td  style="width:5%;">';
+								echo '<input type="checkbox" name="jr[]" value="'.$row['jr_number'].'"/>';
+							echo '</td>';
+							echo '<td  style="width:20%;">';
+								echo $row['jr_number'];
+							echo '</td>';
+							echo '<td  style="width:20%px;">';
+								echo $row['date_created'];
+							echo '</td>';
+							echo '<td  style="width:35%;">';
+								echo $row['service_type'];
+							echo '</td>';
+							echo '<td style="width:20%">';
+								echo $row['amount'];
+							echo '</td>';
+						echo '</tr>';
+					}
+					echo '</table><br/>';
+					
+					echo '<table style="width:100%">';
+					echo '<col width="150">';
+					echo '<tr>';
+						echo '<td>';
+							echo 'Amount (in words):';
+						echo '</td>';
+						echo '<td>';
+							echo '<input type="text" style="width:300px" name="amountWords" required/>';
+						echo '</td>';
+					echo '</tr>';
+					echo '</table>';
+					
+					echo '<br/><input type="submit" id="generate" name="generate" value="Generate" style="width:200px"/>';
+					
+					echo '</fieldset>';
+					echo '</form>';
+				}
+			}
+		}
 		
-		//generation of SOA
+		if(isset($_POST['gogo'])){
+			$jrs=$_POST["jr"];
+			
+			for($i=0 ; $i<count($jrs) ; $i++){
+				echo $jrs[$i];
+				echo '<br/>';
+			}
+			echo '<form method="post" action="#top">';
+				echo '<input type="submit" id="back" name = "back" value="Back" style="width:100px">';
+			echo '</form>';
+		}
+		
+		//after choosing the job requests
 		if(isset($_POST['generate'])){
 			if($_POST['cliente']!=""){
 				
@@ -680,10 +789,18 @@
 				</table>
 					<br/>
 					&nbsp; This is to inform you that for the services listed below, your office has incurred a total amount of <b> <?php echo " ".$amountWords.", ";?>Php <?php
-					$stmt = "SELECT sum(amount) FROM job_request 
-					WHERE section='$sessionUserSection' and client_office like '$cliente' and bill_status like 'Unbilled'
-					and status like 'Done' and amount!=0;";
-
+					if($sessionUserSection!="Rent to Own"){
+						$jrs=$_POST["jr"];
+						for($i=0 ; $i<count($jrs); $i++){
+							$jrToBill = $jrs[$i];
+							$stmt = "SELECT amount FROM job_request 
+							WHERE jr_number='$jrToBill';";
+							$result = mysqli_query($con,$stmt);
+							$a = mysqli_fetch_array($result);
+							$total = $total + $a[0];
+						}
+					}
+					
 					if($sessionUserSection=="Rent to Own"){
 						$stmt = "SELECT monthly_payment FROM rent_to_own_monthly 
 						WHERE client_name='$cliente' and bill_status='Unbilled'
@@ -693,34 +810,17 @@
 					if($cliente=="Personal" && $sessionUserSection=="Tech Support"){
 						$account="UPLB-FI (ACCT. #2009-01ITC)";
 					}
-					//--------------Pause HEre-----------//
+					
 					$result = mysqli_query($con,$stmt);
 					$a = mysqli_fetch_array($result);
 					$total = $a[0];
-					echo $a[0]; ?></b>
+					echo $total; ?></b>
 					<br/>
 					Please prepare the payment to the account of <b><?php echo $account?>.</b>
 					<br/>
 				<?php
-				//looks for job requests of the chosen client office
-				//that are already done, but not yet billed, and if it is not free,
-				//meaning, there is an amount indicated
-				$stmt = "SELECT jr_number, concat(monthname(date_created), ' ', day(date_created), ', ',year(date_created)) as date, service_type, amount FROM job_request 
-					WHERE section='$sessionUserSection' and client_office like '$cliente' and bill_status like 'Unbilled'
-					and status like 'Done' and amount!=0;";
-	
-				$result = mysqli_query($con,$stmt);
-				
-				if($sessionUserSection=="Rent to Own"){
-					$stmt = "SELECT jr_number,concat(monthname(month), ', ',year(month)) as date, monthly_payment FROM rent_to_own_monthly 
-						WHERE client_name='$cliente' and bill_status='Unbilled'
-						and payment_status='Unpaid' ORDER BY count ASC;";
-					$result = mysqli_query($con,$stmt);
-				}
-				
+				//list of chosen job requests
 				$count=0;
-				
-				//table of job requests of the client
 				echo '<table class="soaTable" cellspacing="0" border=1px >';
 				echo '<tr>';
 					echo '<th  style="width:20%;">';
@@ -736,12 +836,19 @@
 						echo "Amount";
 					echo '</th>';
 				echo '</tr>';
+				
 				if($sessionUserSection!="Rent to Own"){
-					while($row=mysqli_fetch_assoc($result)){
+					$jrs=$_POST["jr"];
+					for($i=0 ; $i<count($jrs); $i++){
+						$jrToBill = $jrs[$i];
+						$stmt = "SELECT concat(monthname(date_created), ' ', day(date_created), ', ',year(date_created)) as date, service_type, amount FROM job_request 
+						WHERE jr_number='$jrToBill';";
+						$result = mysqli_query($con,$stmt);
+						$row = mysqli_fetch_assoc($result);
+						
 						echo '<tr>';
 							echo '<td style="width:20%;">';
-								echo $row['jr_number'];
-								$id = $row['jr_number'];
+								echo $jrToBill;
 							echo '</td>';
 							echo '<td style="width:20%;">';
 								echo $row['date'];
@@ -750,16 +857,23 @@
 								echo $row['service_type'];
 							echo '</td>';
 							echo '<td style="width:20%;">';
-								echo $row['amount'].".00";
+								echo $row['amount'];
 							echo '</td>';
 						echo '</tr>';
 						
-						$updatestmt = "UPDATE job_request SET bill_status='Billed', date_billed = current_date, soa_number = $soaNum where jr_number like '$id';";
+						$updatestmt = "UPDATE job_request SET bill_status='Billed', date_billed = current_date, soa_number = $soaNum where jr_number='$jrToBill';";
 						$updateresult = mysqli_query($con,$updatestmt);
 						$count ++;
 					}
-				}else{
+				}
+				
+				if($sessionUserSection=="Rent to Own"){
 					//------------------only for Rent to Own-------------//
+					$stmt = "SELECT jr_number,concat(monthname(month), ', ',year(month)) as date, monthly_payment FROM rent_to_own_monthly 
+						WHERE client_name='$cliente' and bill_status='Unbilled'
+						and payment_status='Unpaid' ORDER BY count ASC;";
+					$result = mysqli_query($con,$stmt);
+
 					$row=mysqli_fetch_assoc($result);
 					echo '<tr>';
 						echo '<td style="width:20%;">';
@@ -1022,7 +1136,7 @@
 							echo $row['service_type'];
 						echo '</td>';
 						echo '<td style="width:20%;">';
-							echo "PHP ".$row['amount'].".00";
+							echo $row['amount'];
 						echo '</td>';
 					echo '</tr>';
 				}
